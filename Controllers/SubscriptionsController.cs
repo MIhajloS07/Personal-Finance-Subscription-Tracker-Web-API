@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Distributed;
 using Personal_Finance___Subscription_Tracker_API.Data;
+using Personal_Finance___Subscription_Tracker_API.DTOs.Subscription;
 using Personal_Finance___Subscription_Tracker_API.Model;
 using System.Text.Json;
 
@@ -35,30 +36,71 @@ namespace Personal_Finance___Subscription_Tracker_API.Controllers
         /// get all subscription by id 
         /// </summary>
         [HttpGet("{id:int}")]
-        public async Task<ActionResult<Subscription>> GetById(int id)
+        public async Task<ActionResult<SubscriptionDto>> GetById(int id)
         {
             string cacheKey = $"subscription_{id}";
             //check in redis
             var cachedData = await _cache.GetStringAsync(cacheKey);
             if (!string.IsNullOrEmpty(cachedData))
             {
-                var cachedSubscription = JsonSerializer.Deserialize<Subscription>(cachedData);
-                return Ok(cachedSubscription);
+                var cachedSubscriptionDto = JsonSerializer.Deserialize<SubscriptionDto>(cachedData);
+                return Ok(cachedSubscriptionDto);
             }
 
             // if data is not in Redis, check database
-            var subscription = await _context.Subscriptions.FindAsync(id);
+            var subscription = await _context.Subscriptions
+                .AsNoTracking()
+                .FirstOrDefaultAsync(s => s.Id == id);
             if (subscription == null)
                 return NotFound($"Subscription with id - {id} not found.");
+
+            var subscriptionDto = MapToSubscriptionDto(subscription);
 
             // Write data in redis 5 min
             var cacheOptions = new DistributedCacheEntryOptions
             {
                 AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5)
             };
-            await _cache.SetStringAsync(cacheKey, JsonSerializer.Serialize(subscription), cacheOptions);
+            await _cache.SetStringAsync(cacheKey, JsonSerializer.Serialize(subscriptionDto), cacheOptions);
 
-            return Ok(subscription);
+            return Ok(subscriptionDto);
+        }
+
+        /// <summary>
+        /// Get all subscriptions for a specific user by UserId
+        /// </summary>
+        /// 
+        [HttpGet("user/{userId:int}")]
+        public async Task<ActionResult<SubscriptionDto>> GetSubscriptionsByUserId(int userId)
+        {
+            string cacheKey = $"user_subscription_{userId}";
+            //check in redis
+            var cachedData = await _cache.GetStringAsync(cacheKey);
+            if (!string.IsNullOrEmpty(cachedData))
+            {
+                var cachedSubscriptionDto = JsonSerializer.Deserialize<SubscriptionDto>(cachedData);
+                return Ok(cachedSubscriptionDto);
+            }
+
+            var userExists = await _context.Users.AnyAsync(u => u.Id == userId);
+            if (!userExists)
+                return NotFound($"User with id - {userId} not found.");
+
+            var subscriptions = await _context.Subscriptions
+                .Where(s => s.UserId == userId)
+                .AsNoTracking()
+                .ToListAsync();
+
+            var subscriptionDtos = subscriptions.Select(MapToSubscriptionDto).ToList();
+
+            // Write data in redis 5 min
+            var cacheOptions = new DistributedCacheEntryOptions
+            {
+                AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5)
+            };
+            await _cache.SetStringAsync(cacheKey, JsonSerializer.Serialize(subscriptionDtos), cacheOptions);
+
+            return Ok(subscriptionDtos);
         }
 
         /// <summary>
@@ -174,6 +216,12 @@ namespace Personal_Finance___Subscription_Tracker_API.Controllers
             await _cache.RemoveAsync(cacheKey);
 
             return NoContent();
+        }
+        #endregion
+        #region helper methods
+        private object MapToSubscriptionDto(Subscription subscription)
+        {
+            throw new NotImplementedException();
         }
         #endregion
     }

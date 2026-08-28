@@ -1,13 +1,11 @@
-﻿using Microsoft.AspNetCore.Http.HttpResults;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Distributed;
 using Personal_Finance___Subscription_Tracker_API.Data;
-using Personal_Finance___Subscription_Tracker_API.DTOs.Subscription
+using Personal_Finance___Subscription_Tracker_API.DTOs.Subscription;
 using Personal_Finance___Subscription_Tracker_API.DTOs.User;
 using Personal_Finance___Subscription_Tracker_API.Model;
 using System.Text.Json;
-using System.Text.Json.Serialization;
 
 namespace Personal_Finance___Subscription_Tracker_API.Controllers
 {
@@ -17,11 +15,6 @@ namespace Personal_Finance___Subscription_Tracker_API.Controllers
     {
         private readonly AppDbContext _context;
         private readonly IDistributedCache _cache;
-
-        private readonly JsonSerializerOptions _jsonOptions = new JsonSerializerOptions
-        {
-            ReferenceHandler = ReferenceHandler.IgnoreCycles
-        };
 
         public UsersController(AppDbContext context, IDistributedCache cache)
         {
@@ -57,8 +50,8 @@ namespace Personal_Finance___Subscription_Tracker_API.Controllers
             var cachedData = await _cache.GetStringAsync(cacheKey);
             if (!string.IsNullOrEmpty(cachedData))
             {
-                var cachedUser = JsonSerializer.Deserialize<User>(cachedData, _jsonOptions);
-                return Ok(cachedUser);
+                var cachedUserDto = JsonSerializer.Deserialize<UserDto>(cachedData);
+                return Ok(cachedUserDto);
             }
             // if data is not in redis - check in database
             var user = await _context.Users
@@ -76,7 +69,7 @@ namespace Personal_Finance___Subscription_Tracker_API.Controllers
             {
                 AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5)
             };
-            await _cache.SetStringAsync(cacheKey, JsonSerializer.Serialize(userDto, _jsonOptions), cacheOptions);
+            await _cache.SetStringAsync(cacheKey, JsonSerializer.Serialize(userDto) , cacheOptions);
 
             return Ok(userDto);
         }
@@ -94,14 +87,14 @@ namespace Personal_Finance___Subscription_Tracker_API.Controllers
             var cachedData = await _cache.GetStringAsync(cacheKey);
             if (!string.IsNullOrEmpty(cachedData))
             {
-                var cachedUser = JsonSerializer.Deserialize<User>(cachedData, _jsonOptions);
-                return Ok(cachedUser);
+                var cachedUserDto = JsonSerializer.Deserialize<UserDto>(cachedData);
+                return Ok(cachedUserDto);
             }
             // if data is not in redis - check in database
             var user = await _context.Users
                 .Include(u => u.Subscriptions)
                 .AsNoTracking()
-                .FirstOrDefaultAsync(u => u.Email == email);
+                .FirstOrDefaultAsync(u => u.Email.ToLower() == cleanEmail);
 
             if (user == null)
                 return NotFound($"User with email - {email} not found.");
@@ -113,7 +106,7 @@ namespace Personal_Finance___Subscription_Tracker_API.Controllers
             {
                 AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5)
             };
-            await _cache.SetStringAsync(cacheKey, JsonSerializer.Serialize(userDto, _jsonOptions), cacheOptions);
+            await _cache.SetStringAsync(cacheKey, JsonSerializer.Serialize(userDto), cacheOptions);
 
             return Ok(userDto);
         }
