@@ -22,18 +22,40 @@ namespace Personal_Finance___Subscription_Tracker_API.Controllers
         }
 
         #region get_methods
-
         /// <summary>
         /// get all subscription
         /// </summary>
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Subscription>>> GetAllSubscriptions()
+        public async Task<ActionResult<IEnumerable<SubscriptionDto>>> GetAllSubscriptions()
         {
-            return await _context.Subscriptions.ToListAsync();
+            string cacheKey = "all_subscriptions";
+            //check in redis
+            var cachedData = await _cache.GetStringAsync(cacheKey);
+            if (!string.IsNullOrEmpty(cachedData))
+            {
+                var cachedSubscriptions = JsonSerializer.Deserialize<List<SubscriptionDto>>(cachedData);
+                return Ok(cachedSubscriptions);
+            }
+
+            // all subscriptions
+            var subscriptions = await _context.Subscriptions
+                .AsNoTracking()
+                .ToListAsync();
+
+            var subscriptionsDtos = subscriptions.Select(MapToSubscriptionDto).ToList();
+
+            // Write in Redis cache 5mins
+            var cacheOptions = new DistributedCacheEntryOptions
+            {
+                AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5)
+            };
+            await _cache.SetStringAsync(cacheKey, JsonSerializer.Serialize(subscriptionsDtos), cacheOptions);
+
+            return Ok(subscriptionsDtos);
         }
 
         /// <summary>
-        /// get all subscription by id 
+        /// get subscription by id 
         /// </summary>
         [HttpGet("{id:int}")]
         public async Task<ActionResult<SubscriptionDto>> GetById(int id)
@@ -71,14 +93,14 @@ namespace Personal_Finance___Subscription_Tracker_API.Controllers
         /// </summary>
         /// 
         [HttpGet("user/{userId:int}")]
-        public async Task<ActionResult<SubscriptionDto>> GetSubscriptionsByUserId(int userId)
+        public async Task<ActionResult<IEnumerable<SubscriptionDto>>> GetSubscriptionsByUserId(int userId)
         {
             string cacheKey = $"user_subscription_{userId}";
             //check in redis
             var cachedData = await _cache.GetStringAsync(cacheKey);
             if (!string.IsNullOrEmpty(cachedData))
             {
-                var cachedSubscriptionDto = JsonSerializer.Deserialize<SubscriptionDto>(cachedData);
+                var cachedSubscriptionDto = JsonSerializer.Deserialize<List<SubscriptionDto>>(cachedData);
                 return Ok(cachedSubscriptionDto);
             }
 
@@ -89,42 +111,62 @@ namespace Personal_Finance___Subscription_Tracker_API.Controllers
             var subscriptions = await _context.Subscriptions
                 .Where(s => s.UserId == userId)
                 .AsNoTracking()
+                .Select(s => new SubscriptionDto
+                {
+                    Id = s.Id,
+                    Name = s.Name,
+                    Price = s.Price,
+                    Currency = s.Currency,
+                    PaymentDate = s.PaymentDate,
+                    Category = s.Category,
+                    UserId = s.UserId
+                })
                 .ToListAsync();
-
-            var subscriptionDtos = subscriptions.Select(MapToSubscriptionDto).ToList();
 
             // Write data in redis 5 min
             var cacheOptions = new DistributedCacheEntryOptions
             {
                 AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5)
             };
-            await _cache.SetStringAsync(cacheKey, JsonSerializer.Serialize(subscriptionDtos), cacheOptions);
+            await _cache.SetStringAsync(cacheKey, JsonSerializer.Serialize(subscriptions), cacheOptions);
 
-            return Ok(subscriptionDtos);
+            return Ok(subscriptions);
         }
 
         /// <summary>
         /// get all subscription by name
         /// </summary>
         [HttpGet("by-name/{name}")]
-        public async Task<ActionResult<IEnumerable<Subscription>>> GetByName(string name)
+        public async Task<ActionResult<IEnumerable<SubscriptionDto>>> GetByName(string name)
         {
             if (string.IsNullOrWhiteSpace(name))
                 return BadRequest("Name parameter cannot be empty.");
 
-            string cacheKey = $"sub_search_{name.Trim().ToLower()}";
+            string normalizedName = name.Trim().ToLowerInvariant();
+            var cacheKey = $"sub_search_{normalizedName}";
 
             //check in redis
             var cachedData = await _cache.GetStringAsync(cacheKey);
             if (!string.IsNullOrEmpty(cachedData))
             {
-                var cachedSubscription = JsonSerializer.Deserialize<IEnumerable<Subscription>>(cachedData);
+                var cachedSubscription = JsonSerializer.Deserialize<List<SubscriptionDto>>(cachedData);
                 return Ok(cachedSubscription);
             }
 
             // if data is not in Redis, check database
             var subscriptions = await _context.Subscriptions
-                .Where(x => x.Name.ToLower().Contains(name.ToLower()))
+                .Where(x => EF.Functions.Like(x.Name.ToLower(), $"%{normalizedName}%"))
+                .AsNoTracking()
+                .Select(s => new SubscriptionDto
+                {
+                    Id = s.Id,
+                    Name = s.Name,
+                    Price = s.Price,
+                    Currency = s.Currency,
+                    PaymentDate = s.PaymentDate,
+                    Category = s.Category,
+                    UserId = s.UserId
+                })
                 .ToListAsync();
 
             if (!subscriptions.Any())
@@ -146,18 +188,32 @@ namespace Personal_Finance___Subscription_Tracker_API.Controllers
         /// Create a new subscription
         /// </summary>
         [HttpPost]
-        public async Task<ActionResult<Subscription>> Create(Subscription subscription)
+        public async Task<ActionResult<SubscriptionDto>> Create(CreateSubscriptionDto createSubscriptionDto)
         {
-            var userExists = await _context.Users.AnyAsync(u => u.Id == subscription.UserId);
-            if (!userExists)
+            var user = await _context.Users.FindAsync(createSubscriptionDto.UserId);
+            if (user == null)
+                return BadRequest($"User with ID {createSubscriptionDto.UserId} does not exists.");
+
+            var subscription = new Subscription
             {
-                return BadRequest($"User with ID {subscription.UserId} does not exists.");
-            }
+                Name = createSubscriptionDto.Name.Trim(),
+                Price = createSubscriptionDto.Price,
+                Currency = createSubscriptionDto.Currency.Trim(),
+                PaymentDate = createSubscriptionDto.PaymentDate,
+                Category = createSubscriptionDto.Category,
+                UserId = createSubscriptionDto.UserId
+            };
+
+
             _context.Subscriptions.Add(subscription);
             await _context.SaveChangesAsync();
 
+            var subscriptionDto = MapToSubscriptionDto(subscription);
+
+            await InvalidateRelatedCacheAsync(subscription.UserId, user.Email);
+
             // returns status 201, url to new resource and object
-            return CreatedAtAction(nameof(GetById), new { id = subscription.Id }, subscription);
+            return CreatedAtAction(nameof(GetById), new { id = subscription.Id }, subscriptionDto);
         }
         #endregion
 
@@ -166,33 +222,42 @@ namespace Personal_Finance___Subscription_Tracker_API.Controllers
         /// Update an existing subscription and invalidate Redis cache
         /// </summary>
         [HttpPut("{id:int}")]
-        public async Task<IActionResult> Update(int id, Subscription updatedSubscription)
+        public async Task<IActionResult> Update(int id, UpdateSubscriptionDto updatedSubscriptionDto)
         {
-            if (id != updatedSubscription.Id)
-                return BadRequest("Mismatched Subscription ID.");
-
             var existingSubscription = await _context.Subscriptions.FindAsync(id);
             if (existingSubscription == null)
                 return NotFound($"Subscription with id - {id} not found.");
 
-            // Check if new User with new id exists
-            var userExists = await _context.Users.AnyAsync(u => u.Id == updatedSubscription.UserId);
-            if (!userExists)
-                return BadRequest($"User with ID {updatedSubscription.UserId} does not exists.");
+            int oldUserId = existingSubscription.UserId;
+            var newUser = await _context.Users
+                .AsNoTracking()
+                .FirstOrDefaultAsync(u => u.Id == updatedSubscriptionDto.UserId);
 
+            if (newUser == null)
+                return BadRequest($"User with ID {updatedSubscriptionDto.UserId} does not exist.");
+
+            string? oldUserEmail = oldUserId == updatedSubscriptionDto.UserId
+                ? newUser.Email
+                : await _context.Users.Where(u => u.Id == oldUserId).Select(u => u.Email).FirstOrDefaultAsync();
+            
             // Update values
-            existingSubscription.Name = updatedSubscription.Name;
-            existingSubscription.Price = updatedSubscription.Price;
-            existingSubscription.Currency = updatedSubscription.Currency;
-            existingSubscription.PaymentDate = updatedSubscription.PaymentDate;
-            existingSubscription.Category = updatedSubscription.Category;
-            existingSubscription.UserId = updatedSubscription.UserId;
+            existingSubscription.Name = updatedSubscriptionDto.Name.Trim();
+            existingSubscription.Price = updatedSubscriptionDto.Price;
+            existingSubscription.Currency = updatedSubscriptionDto.Currency.Trim();
+            existingSubscription.PaymentDate = updatedSubscriptionDto.PaymentDate;
+            existingSubscription.Category = updatedSubscriptionDto.Category;
+            existingSubscription.UserId = updatedSubscriptionDto.UserId;
 
             await _context.SaveChangesAsync();
 
             // delete cache from redis
-            string cacheKey = $"subscription_{id}";
-            await _cache.RemoveAsync(cacheKey);
+            await _cache.RemoveAsync($"subscription_{id}");
+            await InvalidateRelatedCacheAsync(oldUserId, oldUserEmail);
+
+            if (oldUserId != updatedSubscriptionDto.UserId)
+            {
+                await InvalidateRelatedCacheAsync(updatedSubscriptionDto.UserId, newUser.Email);
+            }
 
             return NoContent(); // HTTP 204
         }
@@ -208,20 +273,41 @@ namespace Personal_Finance___Subscription_Tracker_API.Controllers
             if (subscription == null)
                 return NotFound($"Subscription with id - {id} not found.");
 
+            var user = await _context.Users.FindAsync(subscription.UserId);
+
             _context.Subscriptions.Remove(subscription);
             await _context.SaveChangesAsync();
 
             // Delete cache from redis
-            string cacheKey = $"subscription_{id}";
-            await _cache.RemoveAsync(cacheKey);
+            await _cache.RemoveAsync($"subscription_{id}");
+            await InvalidateRelatedCacheAsync(subscription.UserId, user?.Email);
 
             return NoContent();
         }
         #endregion
-        #region helper methods
-        private object MapToSubscriptionDto(Subscription subscription)
+        #region helper_methods
+        private static SubscriptionDto MapToSubscriptionDto(Subscription subscription)
         {
-            throw new NotImplementedException();
+            return new SubscriptionDto
+            {
+                Id = subscription.Id,
+                Name = subscription.Name,
+                Price = subscription.Price,
+                Currency = subscription.Currency,
+                PaymentDate = subscription.PaymentDate,
+                Category = subscription.Category,
+                UserId = subscription.UserId
+            };
+        }
+
+        private async Task InvalidateRelatedCacheAsync(int userId, string? userEmail)
+        {
+            await _cache.RemoveAsync("all_subscriptions");
+            await _cache.RemoveAsync($"user_subscription_{userId}");
+            await _cache.RemoveAsync($"user_{userId}");
+
+            if (!string.IsNullOrWhiteSpace(userEmail))
+                await _cache.RemoveAsync($"user_email_{userEmail.Trim().ToLowerInvariant()}");
         }
         #endregion
     }

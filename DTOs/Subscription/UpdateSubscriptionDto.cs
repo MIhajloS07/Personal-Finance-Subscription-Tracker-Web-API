@@ -22,5 +22,8 @@ namespace Personal_Finance___Subscription_Tracker_API.DTOs.Subscription
         [Required]
         [StringLength(50)]
         public string Category { get; set; } = string.Empty;
+
+        [Required]
+        public int UserId { get; set; }
     }
 }
