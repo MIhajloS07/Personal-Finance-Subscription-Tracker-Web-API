@@ -5,6 +5,7 @@ using Personal_Finance___Subscription_Tracker_API.Data;
 using Personal_Finance___Subscription_Tracker_API.DTOs.Subscription;
 using Personal_Finance___Subscription_Tracker_API.DTOs.User;
 using Personal_Finance___Subscription_Tracker_API.Model;
+using Personal_Finance___Subscription_Tracker_API.Services.interfaces;
 using System.Text.Json;
 
 namespace Personal_Finance___Subscription_Tracker_API.Controllers
@@ -13,31 +14,24 @@ namespace Personal_Finance___Subscription_Tracker_API.Controllers
     [ApiController]
     public class UsersController : ControllerBase
     {
-        private readonly AppDbContext _context;
-        private readonly IDistributedCache _cache;
+        private readonly IUserService _userService;
 
-        public UsersController(AppDbContext context, IDistributedCache cache)
+        public UsersController(IUserService userService)
         {
-            _context = context;
-            _cache = cache;
+            _userService = userService;
         }
 
         #region get_methods
 
         /// <summary>
-        /// Get all users with subscriptions mapped to DTO-s
+        /// Get all users with subscriptions 
         /// </summary>
         [HttpGet]
         public async Task<ActionResult<IEnumerable<UserDto>>> GetUsers()
         {
-            var users = await _context.Users
-                .Include(u => u.Subscriptions)
-                .AsNoTracking()
-                .ToListAsync();
-            var userDtos = users.Select(MapToUserDto).ToList();
-            return Ok(userDtos);
+            var users = await _userService.GetAllAsync();
+            return Ok(users);
         }
-
 
         /// <summary>
         /// Get users with subscription by user ID 
@@ -45,33 +39,10 @@ namespace Personal_Finance___Subscription_Tracker_API.Controllers
         [HttpGet("{id:int}")]
         public async Task<ActionResult<UserDto>> GetUserById(int id)
         {
-            string cacheKey = $"user_{id}";
-
-            var cachedData = await _cache.GetStringAsync(cacheKey);
-            if (!string.IsNullOrEmpty(cachedData))
-            {
-                var cachedUserDto = JsonSerializer.Deserialize<UserDto>(cachedData);
-                return Ok(cachedUserDto);
-            }
-            // if data is not in redis - check in database
-            var user = await _context.Users
-                .Include(u => u.Subscriptions)
-                .AsNoTracking()
-                .FirstOrDefaultAsync(u => u.Id == id);
-
+            var user = await _userService.GetByIdAsync(id);
             if (user == null)
                 return NotFound($"User with id - {id} not found.");
-
-            var userDto = MapToUserDto(user);
-
-            // write data in redis 5 min
-            var cacheOptions = new DistributedCacheEntryOptions
-            {
-                AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5)
-            };
-            await _cache.SetStringAsync(cacheKey, JsonSerializer.Serialize(userDto) , cacheOptions);
-
-            return Ok(userDto);
+            return Ok(user);
         }
 
 
@@ -81,34 +52,15 @@ namespace Personal_Finance___Subscription_Tracker_API.Controllers
         [HttpGet("by-email/{email}")]
         public async Task<ActionResult<UserDto>> GetUserByEmail(string email)
         {
-            string cleanEmail = email.Trim().ToLower();
-            string cacheKey = $"user_email_{cleanEmail}";
+            if (string.IsNullOrWhiteSpace(email))
+                return BadRequest("Email parameter cannot be empty.");
 
-            var cachedData = await _cache.GetStringAsync(cacheKey);
-            if (!string.IsNullOrEmpty(cachedData))
-            {
-                var cachedUserDto = JsonSerializer.Deserialize<UserDto>(cachedData);
-                return Ok(cachedUserDto);
-            }
-            // if data is not in redis - check in database
-            var user = await _context.Users
-                .Include(u => u.Subscriptions)
-                .AsNoTracking()
-                .FirstOrDefaultAsync(u => u.Email.ToLower() == cleanEmail);
+            var user = await _userService.GetByEmailAsync(email);
 
             if (user == null)
                 return NotFound($"User with email - {email} not found.");
 
-            var userDto = MapToUserDto(user);
-
-            // write data in redis 5 min
-            var cacheOptions = new DistributedCacheEntryOptions
-            {
-                AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5)
-            };
-            await _cache.SetStringAsync(cacheKey, JsonSerializer.Serialize(userDto), cacheOptions);
-
-            return Ok(userDto);
+            return Ok(user);
         }
         #endregion
         #region post_methods
@@ -118,26 +70,13 @@ namespace Personal_Finance___Subscription_Tracker_API.Controllers
         [HttpPost]
         public async Task<ActionResult<UserDto>> Create(CreateUserDto createUserDto)
         {
-            if (string.IsNullOrWhiteSpace(createUserDto.Email))
-                return BadRequest("Email field cannot be empty. ");
+            var user = await _userService.CreateAsync(createUserDto);
 
-            var emailExists = await _context.Users
-                .AnyAsync(u => u.Email.ToLower() == createUserDto.Email.Trim().ToLower());
-            if (emailExists)
-                return BadRequest($"User with email - {createUserDto.Email} already exists.");
+            if (user == null)
+                return BadRequest(
+                    "User could not be created. Email may be empty or already in use.");
 
-            var user = new User
-            {
-                Email = createUserDto.Email.Trim(),
-                PasswordHash = createUserDto.Password
-            };
-
-            _context.Users.Add(user);
-            await _context.SaveChangesAsync();
-
-            var userDto = MapToUserDto(user);
-
-            return CreatedAtAction(nameof(GetUserById), new { id = user.Id }, userDto);
+            return CreatedAtAction(nameof(GetUserById), new { id = user.Id }, user);
         }
         #endregion
         #region put_methods
@@ -147,31 +86,13 @@ namespace Personal_Finance___Subscription_Tracker_API.Controllers
         [HttpPut("{id:int}")]
         public async Task<IActionResult> Update(int id, UpdateUserDto updateUserDto)
         {
-            var existingUser = await _context.Users.FindAsync(id);
-            if (existingUser == null)
-                return NotFound($"User with id - {id} not found.");
+            var updated = await _userService.UpdateAsync(
+                id,
+                updateUserDto);
 
-            string newCleanEmail = updateUserDto.Email.Trim().ToLower();
-
-            var emailTakenByOther = await _context.Users
-                .AnyAsync(u => u.Email.ToLower() == newCleanEmail && u.Id != id);
-
-            if (emailTakenByOther)
-                return BadRequest($"Email '{updateUserDto.Email}' is already in use by another user.");
-
-            string oldEmail = existingUser.Email.Trim().ToLower();
-
-            existingUser.Email = updateUserDto.Email.Trim();
-
-            if (!string.IsNullOrWhiteSpace(updateUserDto.NewPassword))
-                existingUser.PasswordHash = updateUserDto.NewPassword;
-
-            await _context.SaveChangesAsync();
-
-            // Invalidate cache in Redis
-            await _cache.RemoveAsync($"user_{id}");
-            await _cache.RemoveAsync($"user_email_{oldEmail}");
-            await _cache.RemoveAsync($"user_email_{newCleanEmail}");
+            if (!updated)
+                return NotFound(
+                    $"User with id - {id} not found or email is already in use.");
 
             return NoContent();
         }
@@ -180,43 +101,12 @@ namespace Personal_Finance___Subscription_Tracker_API.Controllers
         [HttpDelete("{id:int}")]
         public async Task<IActionResult> Delete(int id)
         {
-            var user = await _context.Users.FindAsync(id);
-            if (user == null)
+            var deleted = await _userService.DeleteAsync(id);
+
+            if (!deleted)
                 return NotFound($"User with id - {id} not found.");
 
-            string userEmail = user.Email.Trim().ToLower();
-
-            _context.Users.Remove(user);
-            await _context.SaveChangesAsync();
-
-            // Invalidate cache in Redis
-            await _cache.RemoveAsync($"user_{id}");
-            await _cache.RemoveAsync($"user_email_{userEmail}");
-
             return NoContent();
-        }
-        #endregion
-        #region helper methods (Mapping)
-        /// <summary>
-        /// Private helper method to map User entity to UserDto
-        /// </summary>
-        private static UserDto MapToUserDto(User user)
-        {
-            return new UserDto
-            {
-                Id = user.Id,
-                Email = user.Email,
-                Subscriptions = user.Subscriptions?.Select(s => new SubscriptionDto
-                {
-                    Id = s.Id,
-                    Name = s.Name,
-                    Price = s.Price,
-                    Currency = s.Currency,
-                    PaymentDate = s.PaymentDate,
-                    Category = s.Category,
-                    UserId = s.UserId,
-                }).ToList() ?? new List<SubscriptionDto>()
-            };
         }
         #endregion
     }

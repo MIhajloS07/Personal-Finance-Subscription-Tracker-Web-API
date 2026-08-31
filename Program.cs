@@ -1,5 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Personal_Finance___Subscription_Tracker_API.Data;
+using Personal_Finance___Subscription_Tracker_API.Services.implementations;
+using Personal_Finance___Subscription_Tracker_API.Services.interfaces;
 using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -22,6 +24,7 @@ builder.Services.AddStackExchangeRedisCache(options =>
     options.Configuration = builder.Configuration.GetConnectionString("Redis") ?? "localhost:6379";
     options.InstanceName = "SubscriptionTracker_";
 });
+builder.Services.AddScoped<ICacheService, RedisCacheService>();
 
 
 var app = builder.Build();

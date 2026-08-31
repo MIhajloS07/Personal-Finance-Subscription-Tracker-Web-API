@@ -15,7 +15,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Personal Finance & Subscription Tracker API")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+b9dcebe34070b257c9a948e625418194b0fe75d0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+981a6aff8e6b3d86b52a0746aef456dd5613db63")]
 [assembly: System.Reflection.AssemblyProductAttribute("Personal Finance & Subscription Tracker API")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Personal Finance & Subscription Tracker API")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
