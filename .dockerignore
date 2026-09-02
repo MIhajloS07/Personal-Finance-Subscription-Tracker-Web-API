@@ -1,0 +1,13 @@
+bin
+obj
+.git
+.gitignore
+.vs
+.vscode
+*.user
+*.suo
+*.db
+*.sqlite
+node_modules
+.docker
+.env

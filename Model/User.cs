@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 
 namespace Personal_Finance___Subscription_Tracker_API.Model
 {
@@ -9,10 +9,11 @@ namespace Personal_Finance___Subscription_Tracker_API.Model
 
         [Required]
         [EmailAddress]
+        [StringLength(256)]
         public string Email { get; set; } = string.Empty;
 
         [Required]
-        [StringLength(100)]
+        [StringLength(256)]
         public string PasswordHash { get; set; } = string.Empty;
 
         // Subscription relation

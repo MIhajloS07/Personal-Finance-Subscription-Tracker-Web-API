@@ -1,0 +1,25 @@
+# Test files
+**/bin/
+**/obj/
+**/.vs/
+**/.vscode/
+
+# Test results
+*.trx
+coverage.xml
+coveragereport/
+*.coverage
+
+# IDE
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Test artifacts
+TestResults/
+test-results/

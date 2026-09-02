@@ -1,9 +1,10 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Personal_Finance___Subscription_Tracker_API.Data;
 using Personal_Finance___Subscription_Tracker_API.DTOs.Subscription;
 using Personal_Finance___Subscription_Tracker_API.DTOs.User;
 using Personal_Finance___Subscription_Tracker_API.Model;
 using Personal_Finance___Subscription_Tracker_API.Services.interfaces;
+using Personal_Finance___Subscription_Tracker_API.Utils;
 
 namespace Personal_Finance___Subscription_Tracker_API.Services.implementations
 {
@@ -81,7 +82,7 @@ namespace Personal_Finance___Subscription_Tracker_API.Services.implementations
 
         public async Task<UserDto?> CreateAsync(CreateUserDto createUserDto)
         {
-            if (string.IsNullOrWhiteSpace(createUserDto.Email))
+            if (string.IsNullOrWhiteSpace(createUserDto.Email) || string.IsNullOrWhiteSpace(createUserDto.Password))
                 return null;
 
             var emailExists = await _context.Users
@@ -93,7 +94,7 @@ namespace Personal_Finance___Subscription_Tracker_API.Services.implementations
             var user = new User
             {
                 Email = createUserDto.Email.Trim(),
-                PasswordHash = createUserDto.Password
+                PasswordHash = PasswordHasher.HashPassword(createUserDto.Password)
             };
 
             _context.Users.Add(user);
@@ -121,7 +122,7 @@ namespace Personal_Finance___Subscription_Tracker_API.Services.implementations
             existingUser.Email = updateUserDto.Email.Trim();
 
             if (!string.IsNullOrWhiteSpace(updateUserDto.NewPassword))
-                existingUser.PasswordHash = updateUserDto.NewPassword;
+                existingUser.PasswordHash = PasswordHasher.HashPassword(updateUserDto.NewPassword);
 
             await _context.SaveChangesAsync();
 

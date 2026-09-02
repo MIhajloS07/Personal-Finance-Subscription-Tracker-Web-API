@@ -1,0 +1,58 @@
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: finance-api
+    ports:
+      - "8080:8080"
+      - "8081:8081"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=Server=mssql;Database=PersonalFinanceDB;User Id=sa;Password=${APP_DB_PASSWORD};Encrypt=false;TrustServerCertificate=true;
+      - ConnectionStrings__Redis=redis:6379
+      - ASPNETCORE_URLS=http://+:8080
+    depends_on:
+      mssql:
+        condition: service_healthy 
+      redis:
+        condition: service_started
+    networks:
+      - tracker-network
+
+  mssql:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: finance-db
+    environment:
+      - SA_PASSWORD=${DB_SA_PASSWORD}
+      - ACCEPT_EULA=Y
+    ports:
+      - "1433:1433"
+    volumes:
+      - mssql_data:/var/opt/mssql
+    healthcheck:
+      test: [ "CMD", "/opt/mssql-tools18/bin/sqlcmd", "-S", "localhost", "-U", "sa", "-P", "${DB_SA_PASSWORD}", "-C", "-Q", "SELECT 1" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    networks:
+      - tracker-network
+
+  redis:
+    image: redis:7-alpine
+    container_name: finance-cache
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - tracker-network
+
+volumes:
+  mssql_data:
+  redis_data:
+
+networks:
+  tracker-network:
+    driver: bridge

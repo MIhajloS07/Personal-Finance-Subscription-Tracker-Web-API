@@ -1,12 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Caching.Distributed;
-using Personal_Finance___Subscription_Tracker_API.Data;
-using Personal_Finance___Subscription_Tracker_API.DTOs.Subscription;
 using Personal_Finance___Subscription_Tracker_API.DTOs.User;
-using Personal_Finance___Subscription_Tracker_API.Model;
 using Personal_Finance___Subscription_Tracker_API.Services.interfaces;
-using System.Text.Json;
 
 namespace Personal_Finance___Subscription_Tracker_API.Controllers
 {
