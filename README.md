@@ -12,7 +12,7 @@
 ![xUnit](https://img.shields.io/badge/tests-54_passing-4CAF50?style=flat-square&logo=xunit&logoColor=white)
 ![License](https://img.shields.io/badge/license-MIT-blue?style=flat-square)
 
-<img src="https://skillicons.dev/icons?i=cs,dotnet,redis,docker,github&theme=dark" alt="Tech stack icons" />
+<img src="https://skillicons.dev/icons?i=cs,dotnet,redis,docker,github,visualstudio&theme=dark" alt="Tech stack icons" />
 
 <br/><br/>
 
