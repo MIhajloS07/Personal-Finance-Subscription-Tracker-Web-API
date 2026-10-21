@@ -1,645 +1,358 @@
-<p align="center">
-  <img src="https://readme-typing-svg.herokuapp.com?font=Fira+Code&weight=700&size=26&duration=4000&pause=1000&color=3B82F6&center=true&vCenter=true&width=800&height=70&lines=PERSONAL+FINANCE+%26+SUBSCRIPTION+TRACKER+API;Built+with+.NET+10+%2B+SQL+Server+%2B+Redis;Containerized+with+Docker" alt="Typing SVG" />
-</p>
-
 <div align="center">
 
-[![.NET Version](https://img.shields.io/badge/.NET-10.0-512BD4?style=for-the-badge&logo=dotnet)](https://dotnet.microsoft.com/)
-[![C# Version](https://img.shields.io/badge/C%23-12-239120?style=for-the-badge&logo=csharp)](https://docs.microsoft.com/en-us/dotnet/csharp/)
-[![SQL Server](https://img.shields.io/badge/SQL%20Server-2022-CC2927?style=for-the-badge&logo=microsoftsqlserver)](https://www.microsoft.com/en-us/sql-server)
-[![Redis](https://img.shields.io/badge/Redis-7-DC382D?style=for-the-badge&logo=redis)](https://redis.io/)
-[![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?style=for-the-badge&logo=docker)](https://www.docker.com/)
-[![Tests](https://img.shields.io/badge/Tests-54%2F54%20Passing-4CAF50?style=for-the-badge)](https://github.com/your-repo)
-[![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)](LICENSE)
+<img src="documentation-assets/banner.svg" alt="Personal Finance &amp; Subscription Tracker API" width="100%" />
 
-**Production-Ready API** • **Full Test Coverage** • **Enterprise Architecture** • **Containerized**
+<br/>
+
+![.NET](https://img.shields.io/badge/.NET-10-512BD4?style=flat-square&logo=dotnet&logoColor=white)
+![C#](https://img.shields.io/badge/C%23-12-239120?style=flat-square&logo=csharp&logoColor=white)
+![SQL Server](https://img.shields.io/badge/SQL_Server-2022-CC2927?style=flat-square&logo=microsoftsqlserver&logoColor=white)
+![Redis](https://img.shields.io/badge/Redis-7-DC382D?style=flat-square&logo=redis&logoColor=white)
+![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?style=flat-square&logo=docker&logoColor=white)
+![xUnit](https://img.shields.io/badge/tests-54_passing-4CAF50?style=flat-square&logo=xunit&logoColor=white)
+![License](https://img.shields.io/badge/license-MIT-blue?style=flat-square)
+
+<img src="https://skillicons.dev/icons?i=cs,dotnet,mssql,redis,docker,github&theme=dark" alt="Tech stack icons" />
+
+<br/><br/>
+
+**A REST API for tracking personal subscriptions and recurring expenses.**
+Built to learn backend development properly: layered design, a real database, caching, containers and tests.
+
+[Quick start](#quick-start) · [Architecture](#architecture) · [How Redis is used](#how-redis-is-used) · [Docker setup](#docker-setup) · [Endpoints](#api-endpoints) · [Tests](#testing)
 
 </div>
 
----
+<br/>
 
-## Project Overview
-
-Transform personal finance management with a **lightning-fast, scalable REST API** that tracks subscriptions and helps users gain complete control over their recurring expenses. Built with **cutting-edge ASP.NET Core 10**, **Redis caching**, **comprehensive unit testing**, and **Docker containerization**.
-
-**Status:** ✅ **Production Ready** | 🧪 **54/54 Tests Passing** | 📦 **Fully Containerized**
-
----
-
-## Premium Features
-
-### Core Capabilities
-
-```
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
-┃  ⚡ PERFORMANCE OPTIMIZATION                                ┃
-┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┫
-┃  ✓ Redis Caching Layer          (50-90% query reduction)    ┃
-┃  ✓ Async/Await Non-Blocking I/O (10,000+ concurrent reqs)   ┃
-┃  ✓ Connection Pooling           (optimized db access)       ┃
-┃  ✓ Multi-Stage Docker Build     (40% smaller images)        ┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
-
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
-┃  👥 USER MANAGEMENT                                       ┃
-┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┫
-┃  ✓ Secure Registration          (unique email validation) ┃
-┃  ✓ Profile Management           (create/update/delete)    ┃
-┃  ✓ Email Lookup                 (fast search)             ┃
-┃  ✓ Password Security            (hash storage)            ┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
-
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
-┃  📊 SUBSCRIPTION TRACKING                                 ┃
-┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┫
-┃  ✓ Multi-Currency Support       (USD, EUR, RSD, etc)      ┃
-┃  ✓ Category Organization        (streaming, cloud, tools) ┃
-┃  ✓ Payment Date Tracking        (automated reminders)     ┃
-┃  ✓ Full CRUD Operations         (create/read/update/del)  ┃
-┃  ✓ Advanced Filtering           (by user, name, category) ┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
-
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
-┃  🧪 COMPREHENSIVE TESTING                                 ┃
-┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┫
-┃  ✓ Unit Tests (54 tests passing)    (100% coverage goals) ┃
-┃  ✓ Service Layer Tests             (business logic)       ┃
-┃  ✓ Controller Tests                (endpoint validation)  ┃
-┃  ✓ Integration Tests               (database & cache)     ┃
-┃  ✓ Fluent Assertions               (readable test code)   ┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
-
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
-┃  🔒 SECURITY & MONITORING                                 ┃
-┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┫
-┃  ✓ Health Check Endpoint        (/health monitoring)      ┃
-┃  ✓ Service Status Verification  (real-time diagnostics)   ┃
-┃  ✓ Data Validation              (email, constraints)      ┃
-┃  ✓ Error Handling               (comprehensive responses) ┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
-```
+<!-- Replace with a GIF (10-15 s): open Swagger, POST a user, POST a subscription, GET it back twice -->
+<!-- UNCOMMENT after adding the file
+<p align="center">
+  <img src="documentation-assets/demo.gif" alt="API demo in Swagger UI" width="850" />
+</p>
+-->
 
 ---
 
-## 🛠️ Tech Stack
+## About the project
 
-<table>
-<tr>
-  <td align="center"><strong>🔹 Backend</strong><br/>ASP.NET Core 10.0</td>
-  <td align="center"><strong>🔹 Language</strong><br/>C# 12</td>
-  <td align="center"><strong>🔹 Database</strong><br/>SQL Server 2022</td>
-</tr>
-<tr>
-  <td align="center"><strong>🔹 Cache</strong><br/>Redis 7 (Alpine)</td>
-  <td align="center"><strong>🔹 ORM</strong><br/>Entity Framework Core 10</td>
-  <td align="center"><strong>🔹 Testing</strong><br/>xUnit + Moq + FluentAssertions</td>
-</tr>
-<tr>
-  <td align="center"><strong>🔹 Container</strong><br/>Docker & Compose</td>
-  <td align="center"><strong>🔹 API Docs</strong><br/>OpenAPI 3.0 / Swagger</td>
-  <td align="center"><strong>🔹 Design</strong><br/>SOLID Principles</td>
-</tr>
-</table>
+Most people lose track of what they pay for every month: streaming, cloud storage, dev tools, gym. This API lets a user register, add their subscriptions in any currency, group them by category, and query them back by user or by name.
+
+The domain is intentionally simple. The point of the project was everything around it. When I started, I had not worked with Redis or Docker before, so I picked this project to learn them by actually using them: first getting the API to run on its own, then putting SQL Server in a container, then adding a cache in front of it and figuring out when cached data has to be thrown away. The README below describes what ended up in the repo and the reasoning behind it.
+
+## What it does
+
+- **Users**: register with a unique email, read, update and delete profiles, look up by email.
+- **Subscriptions**: full CRUD, multiple currencies, categories, payment dates, filtering by user and by name.
+- **Caching**: frequently read data is served from Redis, and invalidated whenever it changes.
+- **Health endpoint**: `/health` reports the state of the app and its dependencies.
+- **Interactive docs**: Swagger UI is served at the root URL.
+- **Everything in containers**: API, SQL Server and Redis start together with a single `docker compose up`.
+
+## Tech stack
+
+| Area | Technology |
+|---|---|
+| Framework | ASP.NET Core 10, C# 12 |
+| Database | SQL Server 2022 |
+| ORM | Entity Framework Core 10 (code-first migrations) |
+| Cache | Redis 7 (Alpine image) |
+| Containers | Docker, Docker Compose, multi-stage Dockerfile |
+| Testing | xUnit, Moq, FluentAssertions, EF Core InMemory |
+| API docs | OpenAPI / Swagger |
 
 ---
 
-## Quick Start
+## Quick start
 
-### 📦 Docker Compose (Recommended)
+You only need Docker installed.
+
+<p align="center">
+  <img src="documentation-assets/terminal.svg" alt="Starting the stack with docker compose" width="800" />
+</p>
 
 ```bash
-# Clone repository
-git clone <repo-url>
-cd "Personal Finance & Subscription Tracker API"
+git clone https://github.com/MIhajloS07/Personal-Finance-Subscription-Tracker-Web-API.git
+cd Personal-Finance-Subscription-Tracker-Web-API
 
-# Configure environment
-cp .env.example .env
-# Edit .env with your passwords
+cp .env.example .env        # set your own SQL Server password in .env
 
-# Start all services
-docker compose up --pull always
-
-# Access application
-# 🌐 API & Swagger:   http://localhost:8080
-# ✅ Health Check:    http://localhost:8080/health
-# 🗄️  Database:       localhost:1433
-# 💾 Redis Cache:     localhost:6379
-
-# Stop services
-docker compose down
+docker compose up --build
 ```
 
-### 💻 Local Development
+| What | Where |
+|---|---|
+| Swagger UI | http://localhost:8080 |
+| Health check | http://localhost:8080/health |
+| SQL Server | `localhost:1433` |
+| Redis | `localhost:6379` |
+
+Stop everything with `docker compose down` (add `-v` to also wipe the database and cache volumes).
+
+<details>
+<summary><b>Run without Docker</b></summary>
+
+Requirements: .NET 10 SDK, a running SQL Server instance and a running Redis instance. Update the connection strings in `appsettings.Development.json`, then:
 
 ```bash
-# Requirements: .NET 10 SDK, SQL Server 2022, Redis 7
-
-# Restore packages
 dotnet restore
-
-# Apply migrations
 dotnet ef database update
-
-# Run application
 dotnet run
-
-# Access at http://localhost:5000
 ```
+
+</details>
 
 ---
 
-## 🧪 Testing Guide
+## Architecture
 
-### Running Tests
+The project uses a layered structure. Controllers only deal with HTTP, services hold the business rules, and `AppDbContext` is the only place that talks to SQL Server. Services depend on interfaces (`IUserService`, `ISubscriptionService`, `ICacheService`), which are registered through dependency injection. That is also what makes the services easy to test with mocks.
+
+<p align="center">
+  <img src="documentation-assets/architecture-flow.svg" alt="Animated request flow showing a cache hit and a cache miss" width="850" />
+</p>
+
+The animation above shows both paths a read request can take: a cache hit (green) and a cache miss (orange).
+
+```
+.
+├── Controllers/     HTTP endpoints (Users, Subscriptions)
+├── Services/        Business logic, interfaces and implementations, Redis cache service
+├── DTOs/            Request and response contracts, kept separate from entities
+├── Model/           Domain entities (User, Subscription)
+├── Data/            AppDbContext and EF Core configuration
+├── Migrations/      EF Core migrations
+├── Utils/           Helpers
+├── Tests/           Unit tests, fixtures and test data generators
+├── Dockerfile
+├── docker-compose.yml
+└── Program.cs       Composition root and DI setup
+```
+
+A few decisions worth mentioning:
+
+- **DTOs everywhere.** Entities are never returned directly, so the database schema can change without breaking the API contract.
+- **Cache behind an interface.** Services depend on `ICacheService`, not on the Redis client. In tests it is a mock, in production it is `RedisCacheService`.
+- **Async all the way down.** Every service and controller method is async, so threads are not blocked while waiting on the database or the cache.
+
+---
+
+## How Redis is used
+
+This was the part I had to learn from scratch. I use the **cache-aside** pattern: the application checks Redis first, falls back to SQL Server on a miss, and then stores the result for next time. On every write, the affected cache entries are removed so the next read loads fresh data.
+
+<p align="center">
+  <img src="documentation-assets/redis-lifecycle.svg" alt="Life of a cache entry" width="850" />
+</p>
+
+The same flow as a sequence diagram:
+
+```mermaid
+sequenceDiagram
+    participant C as Client
+    participant A as API
+    participant R as Redis
+    participant D as SQL Server
+
+    C->>A: GET /api/subscriptions/user/5
+    A->>R: GET key
+    alt cache hit
+        R-->>A: cached data
+    else cache miss
+        R-->>A: nil
+        A->>D: SELECT ...
+        D-->>A: rows
+        A->>R: SET key (with expiry)
+    end
+    A-->>C: 200 OK
+
+    C->>A: PUT /api/subscriptions/12
+    A->>D: UPDATE ...
+    A->>R: DEL affected keys
+    A-->>C: 204 No Content
+```
+
+The hardest part was not reading from the cache but invalidating it correctly. A subscription belongs to a user, so changing one subscription means both the single-item entry and the per-user list have to be cleared. Getting that wrong gives you stale data, which is worse than no cache at all.
+
+<!-- Add a real screenshot of redis-cli here -->
+<!-- UNCOMMENT after adding the file
+<p align="center">
+  <img src="documentation-assets/redis-cli.png" alt="Inspecting cached keys with redis-cli" width="760" />
+</p>
+-->
+
+You can watch it work yourself:
 
 ```bash
-# Run all tests
+# list cached keys
+docker exec -it finance-cache redis-cli KEYS "*"
+
+# see every command the API sends to Redis in real time
+docker exec -it finance-cache redis-cli MONITOR
+
+# check how long an entry will live
+docker exec -it finance-cache redis-cli TTL <key>
+```
+
+Call the same GET endpoint twice while `MONITOR` is running: the first request goes to SQL Server and writes a key, the second is answered from Redis.
+
+---
+
+## Docker setup
+
+`docker-compose.yml` starts three services on a shared network. The API waits for SQL Server to report healthy before it starts, so migrations don't fail on a database that is still booting.
+
+<p align="center">
+  <img src="documentation-assets/docker-stack.svg" alt="Docker Compose services and volumes" width="850" />
+</p>
+
+- **Persistent volumes** for SQL Server and Redis, so data survives container restarts.
+- **Health check** on SQL Server, and the API depends on it.
+- **Secrets in `.env`**, which is git-ignored. Only `.env.example` is committed.
+- **Multi-stage Dockerfile**: the SDK image compiles and publishes the app, and the final image contains only the ASP.NET runtime and the published output, which keeps it small.
+
+<!-- Add a screenshot of `docker compose ps` or Docker Desktop showing the three containers running -->
+<!-- UNCOMMENT after adding the file
+<p align="center">
+  <img src="documentation-assets/docker-running.png" alt="All three containers running in Docker" width="760" />
+</p>
+-->
+
+---
+
+## API endpoints
+
+Full interactive documentation is in Swagger at `/`.
+
+**Users**
+
+| Method | Route | Description |
+|---|---|---|
+| GET | `/api/users` | List all users |
+| GET | `/api/users/{id}` | Get user by id |
+| GET | `/api/users/by-email/{email}` | Get user by email |
+| POST | `/api/users` | Create user |
+| PUT | `/api/users/{id}` | Update user |
+| DELETE | `/api/users/{id}` | Delete user |
+
+**Subscriptions**
+
+| Method | Route | Description |
+|---|---|---|
+| GET | `/api/subscriptions` | List all subscriptions |
+| GET | `/api/subscriptions/{id}` | Get subscription by id |
+| GET | `/api/subscriptions/user/{userId}` | All subscriptions of a user |
+| GET | `/api/subscriptions/by-name/{name}` | Find by name |
+| POST | `/api/subscriptions` | Create subscription |
+| PUT | `/api/subscriptions/{id}` | Update subscription |
+| DELETE | `/api/subscriptions/{id}` | Delete subscription |
+
+**System**
+
+| Method | Route | Description |
+|---|---|---|
+| GET | `/health` | Service health |
+
+Example request:
+
+```bash
+curl -X POST http://localhost:8080/api/subscriptions \
+  -H "Content-Type: application/json" \
+  -d '{
+        "userId": 1,
+        "name": "Netflix",
+        "category": "Streaming",
+        "amount": 12.99,
+        "currency": "EUR",
+        "nextPaymentDate": "2026-12-01"
+      }'
+```
+
+> Adjust the field names to match your DTOs if they differ.
+
+<!-- Screenshot of Swagger UI with the endpoint list expanded -->
+<!-- UNCOMMENT after adding the file
+<p align="center">
+  <img src="documentation-assets/swagger.png" alt="Swagger UI" width="850" />
+</p>
+-->
+
+---
+
+## Testing
+
+```bash
 dotnet test
-
-# Run with verbose output
-dotnet test -v detailed
-
-# Run specific test class
-dotnet test --filter "UserServiceTests"
-
-# Run specific test method
-dotnet test --filter "CreateAsync_WithValidUser_ShouldCreateUserSuccessfully"
-
-# Generate coverage report
-dotnet test /p:CollectCoverage=true
 ```
 
-### Test Results
+<p align="center">
+  <img src="documentation-assets/tests-summary.svg" alt="54 unit tests passing" width="850" />
+</p>
 
-```
-Test run for .../Personal Finance & Subscription Tracker API.dll
+There are 54 unit tests covering the service layer and the controllers:
 
-✅ Passed:    54
-❌ Failed:    0
-⏭️  Skipped:  0
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Total Duration: ~571 ms
-```
+| Suite | Tests |
+|---|---|
+| `UserService` | 14 |
+| `SubscriptionService` | 20 |
+| `UsersController` | 10 |
+| `SubscriptionsController` | 10 |
 
-### Test Coverage
-
-```
-🧪 UNIT TESTS (54 Total)
-├─ UserService Tests (14 tests)
-│  ├─ CreateAsync_WithValidUser_ShouldCreateUserSuccessfully ✓
-│  ├─ CreateAsync_WithDuplicateEmail_ShouldReturnNull ✓
-│  ├─ CreateAsync_WithEmptyEmail_ShouldReturnNull ✓
-│  ├─ CreateAsync_WithNullEmail_ShouldReturnNull ✓
-│  ├─ GetAllAsync_ShouldReturnAllUsers ✓
-│  ├─ GetByIdAsync_WithValidId_ShouldReturnUser ✓
-│  ├─ GetByIdAsync_WithInvalidId_ShouldReturnNull ✓
-│  ├─ GetByEmailAsync_WithValidEmail_ShouldReturnUser ✓
-│  ├─ GetByEmailAsync_WithInvalidEmail_ShouldReturnNull ✓
-│  ├─ UpdateAsync_WithValidUser_ShouldUpdateSuccessfully ✓
-│  ├─ UpdateAsync_WithInvalidId_ShouldReturnFalse ✓
-│  ├─ UpdateAsync_WithDuplicateEmail_ShouldReturnFalse ✓
-│  ├─ DeleteAsync_WithValidId_ShouldDeleteSuccessfully ✓
-│  └─ DeleteAsync_WithInvalidId_ShouldReturnFalse ✓
-│
-├─ SubscriptionService Tests (20 tests)
-│  ├─ Create Tests (3)
-│  ├─ Read Tests (8)
-│  ├─ Update Tests (5)
-│  └─ Delete Tests (4)
-│
-├─ UsersController Tests (10 tests)
-│  ├─ HTTP endpoint validation
-│  ├─ Status code verification
-│  └─ Response model testing
-│
-└─ SubscriptionsController Tests (10 tests)
-   ├─ HTTP endpoint validation
-   ├─ Status code verification
-   └─ Response model testing
-```
-
-### Test Architecture
-
-```
-Tests/
-├─ Fixtures/
-│  └─ DatabaseFixture.cs
-│     ├─ In-Memory Database Setup
-│     ├─ ClearAsync() - Test Data Cleanup
-│     └─ IDisposable - Resource Management
-│
-├─ TestData/
-│  └─ TestDataGenerator.cs
-│     ├─ GenerateValidUser()
-│     ├─ GenerateValidSubscription()
-│     └─ GenerateUsers()
-│
-├─ Services/
-│  ├─ UserServiceTests.cs (14 tests)
-│  └─ SubscriptionServiceTests.cs (20 tests)
-│
-└─ Controllers/
-   ├─ UsersControllerTests.cs (10 tests)
-   └─ SubscriptionsControllerTests.cs (10 tests)
-```
-
-### Testing Stack
-
-```
-📚 TEST FRAMEWORKS & TOOLS
-├─ xUnit 2.9.3           → Modern test framework
-├─ Moq 4.20.72           → Mocking library (services, cache)
-├─ FluentAssertions 8.10  → Readable assertions
-├─ EF Core InMemory      → Test database (no SQL needed)
-└─ Custom Fixtures       → Reusable test setup
-```
-
-### Key Testing Patterns
+Service tests run against EF Core's in-memory provider through a shared `DatabaseFixture`, so they need no SQL Server. The cache is replaced with a Moq mock of `ICacheService`, which lets the tests check that entries are read and invalidated at the right moments. Assertions use FluentAssertions, and tests follow Arrange-Act-Assert:
 
 ```csharp
-// 1️⃣ Fixture-Based Testing
-public class UserServiceTests : IClassFixture<DatabaseFixture>
-{
-    private readonly DatabaseFixture _fixture;
-    
-    public UserServiceTests(DatabaseFixture fixture)
-    {
-        _fixture = fixture;  // Injected, reused across tests
-    }
-}
-
-// 2️⃣ Arrange-Act-Assert Pattern
 [Fact]
-public async Task CreateAsync_WithValidUser_ShouldCreateUserSuccessfully()
+public async Task CreateAsync_WithDuplicateEmail_ShouldReturnNull()
 {
     // Arrange
     await _fixture.ClearAsync();
-    var createUserDto = new CreateUserDto 
-    { 
-        Email = "newuser@example.com", 
-        Password = "secure_password_123" 
-    };
-    
+    await _userService.CreateAsync(new CreateUserDto { Email = "a@b.com", Password = "secret123" });
+
     // Act
-    var result = await _userService.CreateAsync(createUserDto);
-    
+    var result = await _userService.CreateAsync(new CreateUserDto { Email = "a@b.com", Password = "secret123" });
+
     // Assert
-    result.Should().NotBeNull();
-    result.Email.Should().Be(createUserDto.Email);
-    result.Id.Should().BeGreaterThan(0);
+    result.Should().BeNull();
 }
-
-// 3️⃣ Mocking External Dependencies
-var mockCache = new Mock<ICacheService>();
-_userService = new UserService(_fixture.Context, mockCache.Object);
-
-// 4️⃣ Fluent Assertions
-result.Should().NotBeNull()
-      .And.HaveCount(3)
-      .And.AllSatisfy(r => r.Email.Should().NotBeNullOrEmpty());
 ```
 
-### Common Test Scenarios
-
-```
-✅ User Management Tests
-   └─ Registration (duplicate email, empty email, null email)
-   └─ Retrieval (by ID, by email, all users)
-   └─ Updates (valid updates, duplicate email conflicts)
-   └─ Deletion (successful delete, invalid ID)
-
-✅ Subscription Management Tests
-   └─ Creation (with valid user, user not found, missing fields)
-   └─ Retrieval (by ID, by user, by name, all subscriptions)
-   └─ Updates (valid updates, invalid ID, user changes)
-   └─ Deletion (successful delete, invalid ID)
-   └─ Cache Tests (cache hits, cache invalidation)
-
-✅ Controller Tests
-   └─ HTTP Status Codes (200, 201, 204, 400, 404, 409)
-   └─ Request Validation (model binding, invalid payloads)
-   └─ Response Models (correct DTO structure)
-
-✅ Integration Tests
-   └─ Database Operations (transactions, cascading deletes)
-   └─ Cache Invalidation (proper clearing on updates)
-   └─ Service Dependencies (correct service interactions)
-```
+<!-- Screenshot of the terminal with `dotnet test` output -->
+<!-- UNCOMMENT after adding the file
+<p align="center">
+  <img src="documentation-assets/tests.png" alt="dotnet test output" width="760" />
+</p>
+-->
 
 ---
 
-## 📡 API Endpoints
+## What I learned
 
-```
-🏢 USERS ENDPOINTS
-├─ GET    /api/users                     → Get all users
-├─ GET    /api/users/{id}                → Get user by ID
-├─ GET    /api/users/by-email/{email}    → Get user by email
-├─ POST   /api/users                     → Create new user
-├─ PUT    /api/users/{id}                → Update user
-└─ DELETE /api/users/{id}                → Delete user
+I wrote this section because the commit history alone doesn't show it.
 
-💳 SUBSCRIPTIONS ENDPOINTS
-├─ GET    /api/subscriptions             → Get all subscriptions
-├─ GET    /api/subscriptions/{id}        → Get subscription by ID
-├─ GET    /api/subscriptions/user/{userId} → Get user subscriptions
-├─ GET    /api/subscriptions/by-name/{name} → Find by name
-├─ POST   /api/subscriptions             → Create subscription
-├─ PUT    /api/subscriptions/{id}        → Update subscription
-└─ DELETE /api/subscriptions/{id}        → Delete subscription
+- **Redis.** I started without knowing it. By the end I understood the cache-aside pattern, why expiry times matter, and why invalidation is the real difficulty. I also learned to debug it with `redis-cli` instead of guessing.
+- **Docker.** Writing a multi-stage Dockerfile, wiring services together with Compose, using health checks so startup order is reliable, and keeping secrets out of the repository.
+- **Entity Framework Core.** Code-first migrations, relationships and constraints (unique email, foreign keys), and keeping entities separate from DTOs.
+- **Testing.** Designing services around interfaces from the start made them testable. Doing that after the fact would have been much more painful.
+- **Debugging across services.** A request touches the API, the cache and the database, and when something is wrong you need to know which one to look at first.
 
-🏥 HEALTH MONITORING
-└─ GET    /health                        → System status
+## Known limitations and next steps
 
-📖 DOCUMENTATION
-└─ GET    /                              → Interactive Swagger UI
-```
+I'd rather list these than pretend they don't exist.
+
+- [ ] Authentication and authorization (JWT) so users can only see their own data
+- [ ] Pagination on list endpoints
+- [ ] Integration tests against real SQL Server and Redis containers (Testcontainers)
+- [ ] Monthly and yearly spending summaries per user
+- [ ] Reminders for upcoming payments
+- [ ] CI pipeline that builds, tests and builds the Docker image on every push
 
 ---
 
-## 📁 Project Structure
+## License
 
-```
-Personal Finance & Subscription Tracker API/
-│
-├── 📂 Controllers/          ← REST Endpoints
-│   ├── UsersController.cs
-│   └── SubscriptionsController.cs
-│
-├── 📂 Services/             ← Business Logic
-│   ├── 📂 interfaces/
-│   │   ├── IUserService.cs
-│   │   ├── ISubscriptionService.cs
-│   │   └── ICacheService.cs
-│   └── 📂 implementations/
-│       ├── UserService.cs
-│       ├── SubscriptionService.cs
-│       └── RedisCacheService.cs
-│
-├── 📂 Models/               ← Domain Entities
-│   ├── User.cs
-│   └── Subscription.cs
-│
-├── 📂 DTOs/                 ← Data Transfer Objects
-│   ├── 📂 User/
-│   │   ├── UserDto.cs
-│   │   ├── CreateUserDto.cs
-│   │   └── UpdateUserDto.cs
-│   └── 📂 Subscription/
-│       ├── SubscriptionDto.cs
-│       ├── CreateSubscriptionDto.cs
-│       └── UpdateSubscriptionDto.cs
-│
-├── 📂 Data/                 ← Database Context
-│   └── AppDbContext.cs
-│
-├── 📂 Migrations/           ← EF Core Migrations
-│   └── [Auto-generated]
-│
-├── 📂 Tests/                ← Unit & Integration Tests
-│   ├── 📂 Fixtures/
-│   │   └── DatabaseFixture.cs
-│   ├── 📂 TestData/
-│   │   └── TestDataGenerator.cs
-│   ├── 📂 Services/
-│   │   ├── UserServiceTests.cs (14 tests)
-│   │   └── SubscriptionServiceTests.cs (20 tests)
-│   └── 📂 Controllers/
-│       ├── UsersControllerTests.cs (10 tests)
-│       └── SubscriptionsControllerTests.cs (10 tests)
-│
-├── Program.cs               ← Entry Point & DI Setup
-├── Dockerfile               ← Container Image
-├── docker-compose.yml       ← Service Orchestration
-├── .dockerignore            ← Docker Build Exclusions
-├── .env.example             ← Environment Template
-├── .gitignore               ← Git Exclusions
-├── appsettings.json         ← Production Configuration
-├── appsettings.Development.json ← Development Configuration
-├── Personal Finance & Subscription Tracker API.csproj
-└── LICENSE
-```
+Released under the [MIT License](LICENSE).
 
----
+## Author
 
-## 🔒 Security & Best Practices
-
-```
-✅ Input Validation
-   ├─ Email format validation
-   ├─ String length limits
-   ├─ Decimal precision constraints
-   └─ Required field verification
-
-✅ Password Security
-   ├─ Never stored as plaintext
-   ├─ Hash storage in database
-   ├─ Implement bcrypt/Argon2 in production
-   └─ Salt with strong randomization
-
-✅ Environment Secrets
-   ├─ Passwords in .env (never committed)
-   ├─ User Secrets in development
-   ├─ Azure Key Vault in production
-   └─ Docker secrets for swarm mode
-
-✅ Data Integrity
-   ├─ Foreign key constraints
-   ├─ Referential integrity
-   ├─ Unique email constraint
-   └─ Cascading deletes
-```
-
----
-
-## 🐳 Docker & Containerization
-
-### Services Architecture
-
-```
-🌐 API SERVICE
-├─ Port: 8080 (HTTP), 8081 (HTTPS)
-├─ Environment: Development mode
-├─ Depends: SQL Server ✓, Redis ✓
-└─ Network: tracker-network
-
-🗄️ SQL SERVER SERVICE
-├─ Image: mcr.microsoft.com/mssql/server:2022-latest
-├─ Port: 1433
-├─ Volume: mssql_data (persistent)
-├─ Health Check: ✓ Every 10s
-└─ Database: PersonalFinanceDB
-
-💾 REDIS SERVICE
-├─ Image: redis:7-alpine
-├─ Port: 6379
-├─ Volume: redis_data (persistent)
-└─ Network: tracker-network
-```
-
-### Multi-Stage Build
-
-```
-Stage 1: BASE (ASP.NET Core 10 runtime)
-   ↓
-Stage 2: BUILD (.NET SDK, compilation)
-   ↓
-Stage 3: PUBLISH (artifact generation)
-   ↓
-Stage 4: FINAL (runtime-only, 200MB image)
-```
-
----
-
-## 📈 Performance Metrics
-
-```
-Request Throughput
-├─ Without Cache: ~200 req/s
-├─ With Cache:    ~5,000 req/s
-└─ Improvement:   2,500% ⬆️
-
-Response Time (Cached)
-├─ Get User:            ~2ms
-├─ Get Subscriptions:   ~3ms
-└─ Database Hit:        ~15-25ms
-
-Memory Usage Per Instance
-├─ Idle:         ~120MB
-├─ Under Load:   ~300MB
-└─ Cache Store:  ~100MB
-
-Docker Image Size
-├─ Before:   ~850MB
-├─ After:    ~200MB
-└─ Reduction: 76% ⬇️
-```
-
----
-
-## 🚨 Troubleshooting
-
-### Container Issues
-
-```bash
-# View logs
-docker compose logs api
-
-# Check service status
-docker compose ps
-
-# Restart services
-docker compose restart
-
-# Full rebuild
-docker compose down -v && docker compose up
-```
-
-### Database Issues
-
-```bash
-# Test connection
-docker exec finance-db /opt/mssql-tools18/bin/sqlcmd \
-  -S localhost -U sa -P $DB_SA_PASSWORD -C -Q "SELECT 1"
-
-# View database logs
-docker compose logs mssql
-```
-
-### Redis Issues
-
-```bash
-# Ping Redis
-docker exec finance-cache redis-cli ping
-# Expected: PONG
-
-# Check Redis logs
-docker compose logs redis
-```
-
----
-
-
-## 🎓 Learning Outcomes & Career Value
-
-This project demonstrates proficiency in:
-
-**🏛️ Architecture & Design Patterns**
-- Layered/N-tier architecture
-- SOLID principles
-- Repository & Dependency Injection patterns
-- DTO pattern for API contracts
-
-**💻 Backend Development**
-- ASP.NET Core 10 mastery
-- C# 12 modern language features
-- RESTful API design
-- Entity Framework Core ORM
-- Async/await patterns
-
-**🗄️ Database Engineering**
-- SQL Server 2022 administration
-- Relational database design
-- EF Core migrations
-- Connection pooling & optimization
-
-**⚡ Performance & Caching**
-- Redis caching implementation
-- Cache-aside pattern
-- Cache invalidation strategies
-- 2,500% performance improvement
-
-**🐳 DevOps & Containerization**
-- Docker multi-stage builds
-- Docker Compose orchestration
-- Service networking & health checks
-- Volume management & persistence
-
-**🧪 Testing & QA**
-- Unit testing with xUnit
-- Mocking with Moq
-- Fluent assertions
-- Test fixtures & integration tests
-- 54/54 tests passing
-
----
-
-## Topics Covered
-
-✅ System design & architecture <br>
-✅ Database optimization & normalization <br>
-✅ Caching strategies (Redis, cache-aside)<br>
-✅ Containerization & DevOps<br>
-✅ Scalability & performance tuning<br>
-✅ SOLID principles & design patterns<br>
-✅ API design & REST conventions<br>
-✅ Testing strategies & coverage<br>
-✅ Security best practices<br>
-✅ Error handling & logging
-
----
-
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
----
-
-## 🤝 Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
-
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
-
----
-
-## 📧 Support
-
-For support, please open an issue on GitHub or contact the development team.
-
----
-
+**Mihajlo S.**
+[GitHub](https://github.com/MIhajloS07) · [Linkedin](https://www.linkedin.com/in/mihajlo-stoiljkovi%C4%87-aa1560355/) · mihajlostoiljkovic554@gmail.com
