@@ -6,13 +6,13 @@
 
 ![.NET](https://img.shields.io/badge/.NET-10-512BD4?style=flat-square&logo=dotnet&logoColor=white)
 ![C#](https://img.shields.io/badge/C%23-12-239120?style=flat-square&logo=csharp&logoColor=white)
-![SQL Server](https://img.shields.io/badge/SQL_Server-2022-CC2927?style=flat-square&logo=microsoftsqlserver&logoColor=white)
 ![Redis](https://img.shields.io/badge/Redis-7-DC382D?style=flat-square&logo=redis&logoColor=white)
+[![Microsoft SQL Server](https://custom-icon-badges.demolab.com/badge/Microsoft%20SQL%20Server-CC2927?logo=mssqlserver-white&logoColor=white)](#)
 ![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?style=flat-square&logo=docker&logoColor=white)
 ![xUnit](https://img.shields.io/badge/tests-54_passing-4CAF50?style=flat-square&logo=xunit&logoColor=white)
 ![License](https://img.shields.io/badge/license-MIT-blue?style=flat-square)
 
-<img src="https://skillicons.dev/icons?i=cs,dotnet,mssql,redis,docker,github&theme=dark" alt="Tech stack icons" />
+<img src="https://skillicons.dev/icons?i=cs,dotnet,redis,docker,github&theme=dark" alt="Tech stack icons" />
 
 <br/><br/>
 
